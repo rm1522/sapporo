@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="300">
+<title>LLM Council レポート — サッポロ新会社 HR戦略ストーリーライン</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent-a: #1d4ed8;
+    --accent-b: #7c3aed;
+    --accent-c: #0891b2;
+    --accent-d: #dc2626;
+    --accent-e: #059669;
+    --agree: #d1fae5;
+    --clash: #fef3c7;
+    --blind: #ede9fe;
+    --rec: #dbeafe;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; font-size: 15px; }
+  .page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* Header */
+  .header { border-bottom: 2px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+  .header-tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .header-meta { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+  /* Question box */
+  .question-box { background: #f1f5f9; border-left: 4px solid var(--accent-a); padding: 16px 20px; border-radius: 4px; margin-bottom: 32px; font-size: 14px; color: #374151; }
+  .question-box strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 6px; }
+
+  /* Verdict cards */
+  .verdict { display: grid; gap: 16px; margin-bottom: 32px; }
+  .verdict-card { border-radius: 8px; padding: 20px 24px; }
+  .verdict-card h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
+  .agree { background: var(--agree); border-left: 4px solid #10b981; }
+  .agree h2 { color: #065f46; }
+  .clash { background: var(--clash); border-left: 4px solid #f59e0b; }
+  .clash h2 { color: #92400e; }
+  .blind { background: var(--blind); border-left: 4px solid #7c3aed; }
+  .blind h2 { color: #4c1d95; }
+  .rec { background: var(--rec); border-left: 4px solid var(--accent-a); }
+  .rec h2 { color: #1e3a8a; }
+  .one { background: #111827; color: #f9fafb; border-radius: 8px; padding: 20px 24px; }
+  .one h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #9ca3af; margin-bottom: 12px; }
+  .one p { font-size: 15px; font-weight: 600; line-height: 1.6; }
+
+  ul { padding-left: 1.4em; }
+  li { margin-bottom: 6px; }
+  p + p { margin-top: 10px; }
+
+  /* Agreement grid */
+  .advisor-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 24px 0 32px; }
+  .advisor-cell { border-radius: 6px; padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 600; }
+  .advisor-cell .role { font-size: 10px; color: rgba(255,255,255,.7); margin-top: 2px; }
+  .adv-a { background: var(--accent-a); color: white; }
+  .adv-b { background: var(--accent-b); color: white; }
+  .adv-c { background: var(--accent-c); color: white; }
+  .adv-d { background: var(--accent-d); color: white; }
+  .adv-e { background: var(--accent-e); color: white; }
+
+  .vote-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+  .vote-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Storyline section */
+  .storyline { margin-top: 40px; }
+  .storyline h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .storyline-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .section-block { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .section-header { background: #f8fafc; padding: 14px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+  .section-header:hover { background: #f1f5f9; }
+  .section-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .section-title { font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .section-tag { font-size: 11px; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 600; }
+  .tag-start { background: #dc2626; }
+  .tag-gap { background: #d97706; }
+  .tag-answer { background: #2563eb; }
+  .tag-risk { background: #7c3aed; }
+  .tag-success { background: #059669; }
+  .chevron { font-size: 12px; color: var(--muted); transition: transform .2s; }
+  .section-body { padding: 20px 24px; border-top: 1px solid var(--border); display: none; }
+  .section-body.open { display: block; }
+  .point { margin-bottom: 14px; padding-left: 12px; border-left: 3px solid var(--border); }
+  .point-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .point-body { font-size: 14px; color: #374151; }
+  .deploy { margin-top: 12px; background: #f8fafc; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+  .deploy strong { color: var(--text); }
+
+  /* Collapsibles */
+  .collapsible-section { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .collapsible-header { background: #f8fafc; padding: 12px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; user-select: none; }
+  .collapsible-header:hover { background: #f1f5f9; }
+  .collapsible-body { padding: 16px 20px; border-top: 1px solid var(--border); display: none; font-size: 14px; line-height: 1.7; }
+  .collapsible-body.open { display: block; }
+  .advisor-label { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 3px; margin-bottom: 10px; color: white; }
+
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-tag">LLM Council レポート</div>
+    <h1>サッポロHD 新規事業 COO<br>人事戦略ストーリーライン構造化</h1>
+    <div class="header-meta">2026年6月23日 ｜ アドバイザー5名 ＋ ピアレビュー5名 ＋ 議長統合</div>
+  </div>
+
+  <!-- Question -->
+  <div class="question-box">
+    <strong>コンシルへの問い</strong>
+    サッポロHD傘下の機能性飲料・ヘルスサイエンスD2C新会社のCOOとして、2年間の人事戦略を事業ケース評価者に提示する必要がある。現状のドラフトは「競争力ある給与・OKR・ファントムストック・規制科学採用・HRIS統合」という施策の羅列になっている。このストーリーラインを論理的・説得的に再構成するにはどうすべきか？
+  </div>
+
+  <!-- Advisor alignment visual -->
+  <div class="advisor-grid">
+    <div class="advisor-cell adv-a">第一原理<div class="role">First Principles</div></div>
+    <div class="advisor-cell adv-b">実行者<div class="role">Executor</div></div>
+    <div class="advisor-cell adv-c">アウトサイダー<div class="role">Outsider</div></div>
+    <div class="advisor-cell adv-d">批判者<div class="role">Contrarian</div></div>
+    <div class="advisor-cell adv-e">拡張者<div class="role">Expansionist</div></div>
+  </div>
+
+  <div style="margin-bottom:8px; font-size:13px; font-weight:600; color:var(--muted)">ピアレビュー：最強の回答投票</div>
+  <div class="vote-row"><div class="vote-dot" style="background:var(--accent-a)"></div>第一原理（A）が最強と判定 — 5票中4票</div>
+  <div class="vote-row"><div class="vote-dot" style="background:var(--accent-d)"></div>批判者（D）と同率1位（1票）</div>
+  <div style="font-size:12px; color:var(--muted); margin-bottom:28px;">最大の盲点：実行者（B）が月次スケジュールのみで「なぜその順番か」の戦略的論拠を欠く</div>
+
+  <!-- Verdict Cards -->
+  <div class="verdict">
+
+    <div class="verdict-card agree">
+      <h2>✅ コンシルの合意点</h2>
+      <ul>
+        <li>現在のドラフトは「HR戦略」ではなく「HR施策リスト」——全5名が同意した唯一の点</li>
+        <li>事業戦略からの逆算ロジックが完全に欠如している</li>
+        <li>ファントムストック・OKR・HRISを並列に並べるのは構造的誤り</li>
+        <li>「人材獲得→定着→成果創出」という因果チェーンで施策を再配置すべき</li>
+        <li>HRISの技術スタック詳細（SmartHR + KING OF TIME等）は評価者への訴求力ゼロ——カット</li>
+      </ul>
+    </div>
+
+    <div class="verdict-card clash">
+      <h2>⚡ コンシルの対立点</h2>
+      <p><strong>ファントムストック数字の扱い：</strong>実行者は「数字は原則だけでよい」、批判者は「PdM200万円では弱すぎる」、拡張者は「200億・500億シナリオで再計算せよ」と三者三様。→ 解決：事業計画の承認フェーズに応じて判断（概念承認なら設計原則のみ、最終承認なら数値を出す）。</p>
+      <p><strong>解雇法制リスクの扱い：</strong>実行者は「業務委託・契約社員比率の設計に組み込め」、拡張者は「カットして採用設計に全振りせよ」と対立。→ 解決：両立する——「採用精度を上げる」と「雇用形態を柔軟に設計する」は排他的でない。</p>
+      <p><strong>組織設計の野心水準：</strong>アウトサイダーは「フェーズ感」、拡張者は「非線形成長ポジション」を主張。→ 解決：評価者が保守型（親会社財務部門）か革新型（VC思考）かで調整。</p>
+    </div>
+
+    <div class="verdict-card blind">
+      <h2>🔍 コンシルが発見したブラインドスポット（全員の盲点）</h2>
+      <p><strong>① 親会社（サッポロHD）との関係設計が完全に抜けている</strong><br>5名全員のレビューアーが独立して指摘。出島型の実効性は、親会社人事・法務・財務との権限境界の交渉にかかっている。ファントムストックもOKRも親会社承認なしに設計できない。「社内承認の政治ストーリー」なしに実現可能性は担保できない。</p>
+      <p><strong>② 評価者（審査者）の懸念に先回りした構造になっていない</strong><br>評価者の典型的懸念（予算回収根拠・創業者依存リスク・規制科学採用失敗リスク）を先回りして潰す構造になっていない。HR戦略の内容ではなく「誰を説得するか」という受け手視点が欠落。</p>
+      <p><strong>③ エグジット戦略とファントムストックが接続していない</strong><br>50億円シナリオの根拠（EBITDA倍率・売上倍率）が空欄。「誰がいつどの条件でバイアウトするか」が未定義のまま数値だけ提示しても「希望的観測」にしか見えない。</p>
+    </div>
+
+    <div class="verdict-card rec">
+      <h2>💡 推奨事項</h2>
+      <p><strong>追加すべき最重要コンテンツ：</strong></p>
+      <ul>
+        <li>「FFC規制科学×D2C LTV最大化」という勝ち筋の明示——これが全施策の根拠の起点</li>
+        <li>「出島型」の因果的正当化——「親会社HR制度では採れない人材が必要だから」という具体的論拠</li>
+        <li>親会社との権限分界の概要（ファントムストック承認プロセスを含む）</li>
+        <li>バイアウトシナリオとファントムストックの接続（50億円の根拠を明示）</li>
+        <li>撤退基準・コンティンジェンシープラン（1行でも書くことで評価者の信頼を構築）</li>
+      </ul>
+      <p style="margin-top:10px"><strong>カットすべきコンテンツ：</strong>HRISの技術スタック詳細 ／ AGC判決の詳細解説（結論だけ残す）</p>
+    </div>
+
+    <div class="one">
+      <h2>🎯 最初にやるべき一つのこと</h2>
+      <p>ストーリーラインの<strong>冒頭1段落を書き直せ</strong>。現在は施策から始まっている。正しい起点はこれだ：</p>
+      <p style="margin-top:12px; font-style:italic; color:#e5e7eb;">「キリンiMUSEが機能性表示食品市場で2026年に清涼飲料水比115%を目指している中、我々がSBL88と柑橘クエン酸という承認済みFFC資産を持ちながら、それを商業化する人材がいないという状況は、経営リスクである。このHR戦略は、その経営リスクへの解答だ。」</p>
+      <p style="margin-top:12px; font-size:13px; color:#9ca3af;">この1段落を書けば、残りの施策が全て「解答」として論理的に配置される。</p>
+    </div>
+
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- Restructured Storyline -->
+  <div class="storyline">
+    <h2>推奨ストーリーライン（具体的構成案）</h2>
+    <div class="storyline-sub">議長統合による推奨アウトライン — 各セクションを開いて詳細を確認</div>
+
+    <!-- Section 1 -->
+    <div class="section-block">
+      <div class="section-header" onclick="toggle(this)">
+        <div>
+          <div class="section-num">Section 1</div>
+          <div class="section-title">なぜ今、この会社のHRが経営課題か</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-tag tag-start">問題定義</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="point">
+          <div class="point-title">1-1. 市場の構造的機会と脅威の同時存在</div>
+          <div class="point-body">キリンiMUSEは2026年に清涼飲料水比115%目標——機能性飲料市場は高成長フェーズ。我々はSBL88（睡眠品質FFC）と柑橘クエン酸という承認済み資産を保有。業界全体のFFC取り下げ率44%という参入障壁の中で、この承認済み資産は再現不可能な競合優位だ。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">1-2. 勝ち筋の定義</div>
+          <div class="point-body">「FFC規制科学による製品の堀」×「D2C LTV最大化による収益エンジン」が事業モデルの核心。BASE FOODベンチマーク（LTV/CAC 4.0x、チャーン約10%、CAC回収2.5ヶ月）を目標水準として設定。この勝ち筋を実現する人材が、現在の親会社HR制度では調達できない——<strong>これがHR戦略の唯一の存在理由。</strong></div>
+        </div>
+        <div class="deploy"><strong>使うファクト：</strong>キリンiMUSE競合データ（115%目標・乳酸菌前年比+40%）、FFC取り下げ率44%、SBL88承認済み資産、BASE FOODベンチマーク</div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section-block">
+      <div class="section-header" onclick="toggle(this)">
+        <div>
+          <div class="section-num">Section 2</div>
+          <div class="section-title">現状の人材ギャップは事業失敗リスクである</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-tag tag-gap">問題の定量化</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="point">
+          <div class="point-title">2-1. 市場賃金と親会社賃金の構造的乖離</div>
+          <div class="point-body">D2Cマーケター市場賃金800〜1,200万円、PdM 900〜1,650万円 vs サッポロHD30代実態578〜690万円。この乖離は「頑張れば採れる」水準ではなく、<strong>制度的に採用不可能なギャップ</strong>だ——出島型が必要な理由はここにある。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">2-2. 採用失敗のコストは許容できない</div>
+          <div class="point-body">エージェント経由採用費：1名あたり350〜480万円（年収1,000万円人材）。採用ミスが発生した場合、日本の労働法（AGC判決：9年間の改善努力が必要）により即座の是正が不可能。採用精度の失敗は「コスト問題」ではなく「2年間の戦略実行を阻害する経営リスク」。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">2-3. 有効求人倍率1.18の売り手市場</div>
+          <div class="point-body">規制科学人材とD2C人材の両方が争奪戦の対象。リファラル採用設計なしに、エージェント依存では勝てない構造。</div>
+        </div>
+        <div class="deploy"><strong>使うファクト：</strong>市場賃金ギャップデータ、採用費350〜480万円、AGC判決（結論のみ）、有効求人倍率1.18</div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section-block">
+      <div class="section-header" onclick="toggle(this)">
+        <div>
+          <div class="section-num">Section 3</div>
+          <div class="section-title">2年間の人材戦略——因果チェーンとして設計された打ち手</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-tag tag-answer">解答（核心）</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="point">
+          <div class="point-title">3-1. 獲得フェーズ（Year 1 前半：Month 1〜6）</div>
+          <div class="point-body">出島型独立給与体系の設立。優先採用ポジション：規制科学人材1〜2名（FFC申請プロセスの内製化）、D2Cマーケター1名。リファラル採用設計をエージェント依存より優先——採用精度と採用費を両立。SBL88承認済み資産は採用市場における差別化ブランド——「この会社でしかできない仕事」として使う。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">3-2. 定着フェーズ（Year 1 後半：Month 6〜12）</div>
+          <div class="point-body">ファントムストック設計：バイアウトシナリオとの接続を明示したうえで導入。50億円シナリオ：PdM 200万円・D2Cマーケター 120万円・CXO 800万円（税引前）。重要：数字は「市場賃金ギャップの補完」ではなく「事業成功への参加権」として設計する。OKRサイクルの起動：給与連動なし（Mercari・SmartHR事例）——成果の可視化と組織学習に特化。HRIS統合は<strong>オペレーション効率化として1行で言及するにとどめる</strong>。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">3-3. 成果創出フェーズ（Year 2）</div>
+          <div class="point-body">規制科学人材の内製化により、FFC申請の自社完結と次製品パイプラインの構築。D2C人材によるLTV/CAC最適化サイクルの確立（BASE FOOD水準4.0xを目標）。Year 2末の組織状態：「SBL88の堀を守り、次の承認資産を追加した状態」を定義する。</div>
+        </div>
+        <div class="deploy"><strong>使うファクト：</strong>ファントムストックシミュレーション数値、OKR給与非連動原則、BASE FOOD LTV/CAC目標、SBL88資産の採用ブランド活用</div>
+      </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section-block">
+      <div class="section-header" onclick="toggle(this)">
+        <div>
+          <div class="section-num">Section 4</div>
+          <div class="section-title">親会社との関係設計——出島型の実効性を担保する条件</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-tag tag-risk">リスク管理</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="point">
+          <div class="point-title">4-1. 権限分界の明示（全員の盲点：新規追加）</div>
+          <div class="point-body">採用・報酬決定権：子会社COO権限で完結。ファントムストック：サッポロHD法務・財務部門の承認プロセスを経て設計（タイムライン明示）。親会社ブランドの採用活用可否：ターゲット人材層により判断。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">4-2. バイアウトシナリオとファントムストックの接続（全員の盲点：新規追加）</div>
+          <div class="point-body">50億円バイアウトの根拠：食品・飲料業界のEBITDA倍率8〜12倍を仮定値として明示。親会社による買収か外部売却かによって設計が変わる——COOとして現時点の仮定を明示する。空欄は「希望的観測」と読まれる。</div>
+        </div>
+        <div class="deploy"><strong>使うファクト：</strong>厚労省モデル出向協定、ファントムストック設計原則（SOAS）、食品飲料EBITDA倍率8〜12倍（Auxo Capital）</div>
+      </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section-block">
+      <div class="section-header" onclick="toggle(this)">
+        <div>
+          <div class="section-num">Section 5</div>
+          <div class="section-title">2年後の成功状態の定義（評価基準の設定）</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-tag tag-success">成功定義</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="point">
+          <div class="point-title">5-1. 定量目標</div>
+          <div class="point-body">規制科学人材の内製化による次FFC承認1件以上。D2C LTV/CAC：BASE FOOD水準4.0xに到達。コアポジション5名以内、全員リファラルまたは直接採用（エージェント依存ゼロ）。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">5-2. 定性的成功状態</div>
+          <div class="point-body">「親会社HR制度に戻れない組織文化が形成された」——これが出島型の本当の成功指標。SBL88の次世代製品パイプラインが規制科学人材により内部で動いている。</div>
+        </div>
+        <div class="point">
+          <div class="point-title">5-3. 撤退基準（審査者への信頼担保）</div>
+          <div class="point-body">Year 1 Month 6時点で規制科学人材が確保できない場合のコンティンジェンシープランを1行で明示する。これを入れることで「過度に楽観的ではない」という審査者への信頼を構築する。</div>
+        </div>
+        <div class="deploy"><strong>使うファクト：</strong>BASE FOOD LTV/CAC、FFC承認済み資産との接続</div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- Individual advisor responses -->
+  <div style="margin-bottom:16px; font-size:15px; font-weight:700;">各アドバイザーの詳細回答</div>
+
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span><span class="advisor-label" style="background:var(--accent-a)">第一原理</span> First Principles Thinker</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      「HR戦略を設計せよ」という問いに答えようとしているが、本質的な問いはこれだ：<strong>この会社は何者になろうとしているのか？</strong><br><br>
+      HR戦略は目的ではない。事業戦略の下位概念だ。現状のストーリーラインは「HR施策の列挙」になっており、論理の起点がズレている。<br><br>
+      <strong>1. 戦略的賭けの明示が先決：</strong>FFC規制科学×D2C LTV最大化という勝ち筋を先に定義せよ。そこから逆算すると「誰が必要か」が自明になる。今は施策が先行し、根拠が後付けになっている。<br>
+      <strong>2. 「出島型」は手段であって戦略ではない：</strong>なぜ出島型か？「親会社のHR制度では採れない人材が必要だから」という因果を明示しなければ、単なる組織論になる。<br>
+      <strong>3. 施策は因果チェーンの中に：</strong>ファントムストック・OKR・HRISを並列に置くのは構造的誤り。「人材獲得→定着→成果創出」という因果チェーンの中にそれぞれ位置づけよ。<br><br>
+      正しい問いはこれだ：「SBL88という規制上の堀を守り拡げるために、2年間で何者を何人どう獲得・定着させるか？」
+    </div>
+  </div>
+
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span><span class="advisor-label" style="background:var(--accent-b)">実行者</span> Executor</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      <strong>月曜日の朝、何をするか？</strong><br><br>
+      現在のストーリーラインの問題は「何をするか」は書いてあるが「いつ、誰が、どの順番で」が抜けていることだ。<br><br>
+      <strong>切るべきもの：</strong>ファントムストックの数字（¥2M、¥1.2M）は今出す必要はない。設計原則だけで十分。細かい数字はむしろ信頼性を下げる。<br><br>
+      <strong>足りないもの：フェーズ分けされた実行計画</strong><br>
+      - Month 1-3：HRIS基盤を稼働させる<br>
+      - Month 3-6：規制科学人材をリファラル経由で1-2名確保<br>
+      - Month 6-12：OKRサイクルを1回回す<br>
+      - Year 2：解雇法制リスク前提で業務委託・契約社員比率を設計する<br><br>
+      各施策に「先行指標」を一つ付けよ。<strong>最優先：HRIS統合とリファラル採用設計を90日以内に完了させる。</strong>
+    </div>
+  </div>
+
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span><span class="advisor-label" style="background:var(--accent-c)">アウトサイダー</span> Outsider</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      <strong>素人目線から言う：これは「HR戦略」に見えない。</strong><br><br>
+      データと施策のリストだ。ストーリーがない。「なぜこのHR戦略が必要か」の答えが弱い。「サッポロの既存HRは古い」は理由になっていない。三段論法が抜けている（何を実現したいか→どんな人材が必要か→何が障壁か）。<br><br>
+      <strong>具体的に「見えない」もの：</strong><br>
+      1. ターゲット人材像がない（D2Cマーケターと規制科学者は全然違う人間）<br>
+      2. フェーズ感がない（1年目と2年目で何が変わるか）<br>
+      3. リスクの話が経営リスクへ接続していない<br><br>
+      <strong>カット：</strong>ファントムストックの試算（PdMで200万円）。なぜファントムなのか＝M&Aシナリオとの接続を先に示せ。<br><br>
+      一言で言うと：<strong>施策の羅列を「人材戦略→組織設計→経営行動」の因果で繋ぎ直せ。</strong>
+    </div>
+  </div>
+
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span><span class="advisor-label" style="background:var(--accent-d)">批判者</span> Contrarian</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      <strong>致命的欠陥：「HR戦略」が「HR施策リスト」になっている。</strong><br><br>
+      事業戦略から逆算したHR戦略になっていない。<br><br>
+      <strong>1. 因果関係が逆転している：</strong>FFC規制科学人材の採用が「重要」と言うが、なぜ内製しなければならないのかの論拠がない。44%の申請取り下げ率は競合の失敗であり、Sapporo自身がSBL88等の承認済資産を持つなら、社内蓄積が必須という論理が要る。<br><br>
+      <strong>2. リスクを直視していない：</strong>日本の解雇規制（9年改善努力）のデータを持ちながら、採用ミスのコストへの対応策がない。ならば採用基準と試用期間設計こそが最重要施策のはずだ。<br><br>
+      <strong>3. ファントムストックの数字が弱すぎる：</strong>50億円バイアウト時にPdMが200万円。これで優秀人材が動くか？人材への投資回収論理も同じ厳密さで示すべきだ。<br><br>
+      <strong>切るべきもの：</strong>HRISの技術スタック詳細（評価者には無関係な実装レベルの話）。
+    </div>
+  </div>
+
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span><span class="advisor-label" style="background:var(--accent-e)">拡張者</span> Expansionist</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      <strong>「出島」を単なるコスト効率の話で終わらせているのが致命的。</strong><br><br>
+      SBL88と柠檬クエン酸の承認済みデータは採用市場における圧倒的な差別化ブランドだ。「規制をクリアした研究基盤のある会社でサイエンスを実装したい」という人材は、報酬だけでは動かせない。ミッションドリブンな採用が可能になる。このポジショニングをHR戦略の冒頭に持ってくるべきだ。<br><br>
+      <strong>ファントムストックの設計が小さすぎる：</strong>50億円バリュエーションではなく、BASE FOODのLTV/CAC 4.0xが達成できるなら200億・500億シナリオもある。なぜ感度分析を提示しないのか？<br><br>
+      <strong>組織設計も防衛的すぎる：</strong>「何人採る」ではなく、「どのポジションが事業の非線形成長を生むか」を軸に設計せよ。PdMと規制科学者が揃った瞬間に、D2C×FFC認証の量産体制が整う。<br><br>
+      <strong>カット：</strong>「9年解雇不可」の話——正しい人を最初に採る採用設計に全振りせよ。
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- Peer review highlights -->
+  <div class="collapsible-section">
+    <div class="collapsible-header" onclick="toggle(this)">
+      <span style="font-size:14px; font-weight:600;">ピアレビュー ハイライト（5名のレビューアー）</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="collapsible-body">
+      <strong>最強の回答：</strong>第一原理（A）が5票中4票を獲得。事業戦略からの逆算という根本的フレームを最も明確に示し、「SBL88という規制上の堀を守り拡げるために」という具体的な問い直しが秀逸と評価された。<br><br>
+      <strong>最大の盲点：</strong>実行者（B）が3票。タイムラインと先行KPIを並べるが「なぜその順番か」の戦略的論拠が薄い。施策間の依存関係の説明なく、ただのガントチャートと同レベルに留まるという批判。<br><br>
+      <strong>5名全員が独立して指摘した共通の盲点：</strong>「親会社（サッポロHD）との関係設計」と「評価者の意思決定ロジックへの配慮」。社内承認の政治ストーリーなしに実現可能性は担保できない。
+    </div>
+  </div>
+
+  <footer>
+    LLM Council — サッポロHD 新規事業 人事戦略ストーリーライン構造化<br>
+    生成日時：2026年6月23日 ｜ このレポートは5分ごとに自動更新
+  </footer>
+
+</div>
+
+<script>
+function toggle(el) {
+  const body = el.nextElementSibling;
+  const chevron = el.querySelector('.chevron');
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+// Auto-open the first storyline section
+document.addEventListener('DOMContentLoaded', function() {
+  const firstSection = document.querySelector('.section-body');
+  if (firstSection) firstSection.classList.add('open');
+});
+</script>
+</body>
+</html>
